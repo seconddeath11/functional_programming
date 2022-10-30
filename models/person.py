@@ -1,34 +1,22 @@
-from models.ticket import Ticket
-from models.wallet import Wallet
+from models.wallet import decrease, increase
+from utils import find_tickets_by_passenger
 
 
-class Person:
-    def __init__(self, id: int, name: str, age: int, wallet: Wallet):
-        self.id = id
-        self.name = name
-        self.wallet = wallet
-        self.age = age
-        self.tickets: list[Ticket] = []
+def has_money(price, wallet) -> bool:
+    return wallet >= price
 
-    def has_money(self, price):
-        return self.wallet.amount >= price
 
-    def has_ticket(self, bus_id: int):
-        for ticket in self.tickets:
-            if ticket.bus_id == bus_id:
-                return True
-        return False
+def has_ticket(passenger_id, bus_id: int, tickets) -> bool:
+    passenger_tickets = find_tickets_by_passenger(passenger_id, tickets)
+    for ticket in passenger_tickets:
+        if ticket["bus_id"] == bus_id:
+            return True
+    return False
 
-    def pay(self, price: int):
-        self.wallet.decrease(price)
 
-    def deposit(self, amount: int):
-        self.wallet.increase(amount)
+def pay(price: int, wallet) -> int:
+    return decrease(wallet, price)
 
-    def __str__(self):
-        return f"id: {self.id}, name: {self.name}, age: {self.age}, money: {self.wallet.amount}"
 
-    def get_ticket(self, bus_id):
-        for ticket in self.tickets:
-            if ticket.bus_id == bus_id:
-                return ticket
+def deposit_wallet(amount: int, wallet) -> int:
+    return increase(wallet, amount)
